@@ -1,28 +1,43 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <!-- 
+    Add the SliceZone to your template, and pass the Slice
+    data and a resolver function as props.
+  -->
+  <SliceZone
+    :slices="document.data.body"
+    :resolver="({ sliceName }) => slices[sliceName]"
+  />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// Import the SliceZone
+import SliceZone from 'vue-slicezone'
+// Import your Slices (ensure the path is correct)
+import TextSlice from './components/slices/TextSlice'
 
 export default {
-  name: 'App',
   components: {
-    HelloWorld
+    SliceZone
+  },
+  data () {
+    return {
+      document: null,
+      // Add your Slices to a "slices" object, which
+      // will be used in the resolver function.
+      slices: {
+        TextSlice,
+      }
+    }
+  },
+  methods: {
+    // Define a method to query Prismic for your document.
+    getContent: async () => {
+      this.document = await this.$prismic.client.getByUID('page', 'homepage')
+    }
+  },
+  created () {
+    // Call your query method when the component loads.
+    this.getContent();
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
